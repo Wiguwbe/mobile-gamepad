@@ -2,6 +2,8 @@
 
 Mobile Universal Gamepad for RetroPie (http://mobilegamepad.net/)
 
+_Ported to native/C server_
+
 ![MobilaGamepad](/other/resources/schema_mobilegamepad.png)
 
 # Quick installation and start
@@ -9,21 +11,19 @@ Mobile Universal Gamepad for RetroPie (http://mobilegamepad.net/)
 * Run below installation script
 
 ```bash
-# Install nodejs (tested with nodejs v12.17.0)
+# Install dependencies
 sudo apt-get update && sudo apt-get upgrade
-curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-sudo apt-get install -y nodejs
+sudo apt-get install libevdev-dev
 
-# Install Grunt Command Line Interface
-sudo npm install -g grunt-cli
-
-# Clone project MobileGamePad and install dependencies
-git clone https://github.com/sbidolach/mobile-gamepad.git
+# Clone project MobileGamePad
+git clone https://github.com/Wiguwbe/mobile-gamepad.git
 cd mobile-gamepad
-npm install
+
+# Run make
+make
 
 # Run MobileGamepad
-sudo grunt start
+./server
 ```
 
 * Open in mobile browser the below URL (Mobile phone and Raspberry Pi have to be on the same network)
@@ -34,13 +34,7 @@ http://[ip_address_raspberry_pi]:8888
 
 * Run gamepad in background and enable on startup
 
-```bash
-# Enable Mobile gamepad on startup
-sudo npm install pm2 -g
-sudo pm2 start app.sh
-sudo pm2 startup
-sudo pm2 save
-```
+_TODO_
 
 # RetroPie configuration
 
