@@ -35,3 +35,7 @@ node_modules
 # Grunt public folder
 dist
 tmp
+
+# C/makefile
+*.o
+server

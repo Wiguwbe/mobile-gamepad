@@ -12,62 +12,62 @@ $(window).load(function() {
         return false;
     }
 
-    // HAPTIC CALLBACK METHOD
-    navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate;
-    var hapticCallback = function() {
-        if (navigator.vibrate) {
-            navigator.vibrate(1);
-        }
-    }
-
     // create socket connection
-    var socket = io();
-    socket
-        .on("connect", function() {
-            if(!$("#warning-message").is(":visible")) {
-                $("#wrapper").show();
-                $("#disconnect-message").hide();
-            }
-            socket.emit('hello', 'add new input');
-        })
-        .on("hello", function(data) {
-            var gamePadId = data.inputId;
+    var ws = new WebSocket("ws://" + location.host + "/websocket");
+    ws.onopen = (event) => {
+        if(!$("#warning-message").is(":visible")) {
+            $("#wrapper").show();
+            $("#disconnect-message").hide();
+        }
+    };
+    ws.onmessage = (event) => {
+        const msg = JSON.parse(event.data);
+        // expect only one message type
 
-            $("#padText").html("<h1>Nr " + gamePadId + "</h1>");
+        var gamePadId = msg.player_no;
+        $("#padText").html("<h1>Nr " + gamePadId + "</h1>");
 
-            $(".btn")
-                .off("touchstart touchend")
-                .on("touchstart", function(event) {
-                    socket.emit("event", {
-                        type: 0x01,
-                        code: $(this).data("code"),
-                        value: 1
-                    });
-                    $(this).addClass("active");
-                    hapticCallback();
-                })
-                .on("touchend", function(event) {
-                    socket.emit("event", {
-                        type: 0x01,
-                        code: $(this).data("code"),
-                        value: 0
-                    });
-                    $(this).removeClass("active");
-                });
-        })
-        .on('disconnect', function() {
-            if(!$("#warning-message").is(":visible")) {
-                $("#wrapper").hide();
-                $("#disconnect-message").show();
-            }
-        });
+        $(".btn")
+            .off("touchstart touchend")
+            .on("touchstart", function(event) {
+                const msg = {
+                    type: 0x01,
+                    code: parseInt($(this).data("code"), 16),
+                    value: 1
+                };
+                ws.send(JSON.stringify(msg));
+                $(this).addClass("active");
+            })
+            .on("touchend", function(event) {
+                const msg = {
+                    type: 0x01,
+                    code: parseInt($(this).data("code"), 16),
+                    value: 0
+                };
+                ws.send(JSON.stringify(msg));
+                $(this).removeClass("active");
+            });
+    };
+    ws.onclose = (event) => {
+        if(!$("#warning-message").is(":visible")) {
+            $("#wrapper").hide();
+            $("#disconnect-message").show();
+        }
+    };
+    ws.onerror = (event) => {
+        if(!$("#warning-message").is(":visible")) {
+            $("#wrapper").hide();
+            $("#disconnect-message").show();
+        }
+    };
 
     sendEvent = function(type, code, value) {
-        socket.emit("event", {
+        let msg = {
             type: type,
             code: code,
             value: value
-        });
+        }; 
+        ws.send(JSON.stringify(msg));
     };
 
     convertDegreeToEvent = function(degree) {
