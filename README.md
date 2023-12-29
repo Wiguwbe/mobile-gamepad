@@ -34,7 +34,11 @@ http://[ip_address_raspberry_pi]:8888
 
 * Run gamepad in background and enable on startup
 
-_TODO_
+```
+# For beablebone/BES (and possibly others)
+sudo cp init/mobile-gamepad /etc/init.d
+sudo chmod +x /etc/init.d/mobile-gamepad
+```
 
 # RetroPie configuration
 
