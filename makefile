@@ -1,5 +1,5 @@
 
-CFLAGS := $(shell pkg-config --cflags libevdev)
+CFLAGS := -std=gnu99 $(shell pkg-config --cflags libevdev)
 LIBS := $(shell pkg-config --libs libevdev)
 
 server: server.o mongoose.o

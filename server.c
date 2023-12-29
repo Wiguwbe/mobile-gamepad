@@ -86,7 +86,15 @@ int setup_uinput(struct ws_data *ws_data)
   struct libevdev *dev;
   struct libevdev_uinput *uidev;
 
+  ws_data->uidev = NULL;
+  ws_data->dev = NULL;
+
   dev = libevdev_new();
+  if(!dev)
+  {
+    MG_ERROR(("failed to create dev device"));
+    return 1;
+  }
   libevdev_set_name(dev, "MobileGamePad");
   libevdev_set_id_bustype(dev, BUS_USB);
   libevdev_set_id_vendor(dev, 0x5);
@@ -220,8 +228,10 @@ static void http_handler(struct mg_connection *c, int ev, void *ev_data, void *u
   {
     struct ws_list *player = (struct ws_list*)c->fn_data;
     MG_INFO(("- controller %d disconnected", player->data.player_no));
-    libevdev_uinput_destroy(player->data.uidev);
-    libevdev_free(player->data.dev);
+    if(player->data.uidev)
+      libevdev_uinput_destroy(player->data.uidev);
+    if(player->data.dev)
+      libevdev_free(player->data.dev);
     del_player(player);
   }
 }
