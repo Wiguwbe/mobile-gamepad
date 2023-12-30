@@ -132,6 +132,20 @@ $(window).load(function() {
     };
 
     var prevEvent;
+    var prevAxis = {x: 127, y: 127};
+
+    handle_input = function(vector) {
+        //console.log(vector)
+        var ev_x = vector.x;
+        ev_x = ev_x >= 0.5 ? 255 : (ev_x <= -0.5 ? 0 : 127);
+        var ev_y = vector.y;
+        ev_y = ev_y <= -0.5 ? 255 : (ev_y >= 0.5 ? 0 : 127);
+        if(ev_x != prevAxis.x)
+            sendEvent(0x03, 0x00, ev_x);
+        if(ev_y != prevAxis.y)
+            sendEvent(0x03, 0x01, ev_y);
+        prevAxis = {x: ev_x, y: ev_y};
+    };
 
     // Create Joystick
     nipplejs.create({
@@ -141,21 +155,24 @@ $(window).load(function() {
             position: {
                 left: '50%',
                 top: '50%'
-            },
-            multitouch: true
+            }
         })
         // start end
         .on('end', function(evt, data) {
             // set joystick to default position
-            sendEventToServer('end');
-            prevEvent = evt.type;
+            //sendEventToServer('end');
+            //prevEvent = evt.type;
+            handle_input({x: 0, y: 0});
             // dir:up plain:up dir:left plain:left dir:down plain:down dir:right plain:right || move
         }).on('move', function(evt, data) {
+            /*
             var event = convertDegreeToEvent(data.angle.degree);
             if (event !== prevEvent) {
                 sendEventToServer(event);
                 prevEvent = event;
             }
+            */
+            handle_input(data.vector);
         })
         .on('pressure', function(evt, data) {
             console.log('pressure');
